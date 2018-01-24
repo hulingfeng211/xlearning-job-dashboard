@@ -50,38 +50,39 @@ export const otherRouter = {
 // 作为Main组件的子页面展示并且在左侧菜单显示的路由写在appRouter里
 export const appRouter = [
     {
-        path: '/group',
-        icon: 'ios-folder',
-        name: 'group',
-        title: 'Group',
-        component: Main,
-        children: [
-            {
-                path: 'page1',
-                icon: 'ios-paper-outline',
-                name: 'page1',
-                title: 'Page1',
-                component: resolve => { require(['@/views/group/page1/page1.vue'], resolve); }
-            },
-            {
-                path: 'page2',
-                icon: 'ios-list-outline',
-                name: 'page2',
-                title: 'Page2',
-                component: resolve => { require(['@/views/group/page2/page2.vue'], resolve); }
-            }
-        ]
-    },
-    {
-        path: '/page',
+        path: '/dashboard',
         icon: 'ios-paper',
-        title: 'Page',
+        title: 'Dashboard',
         name: 'page',
         component: Main,
         children: [
-            { path: 'index', title: 'Page', name: 'page_index', component: resolve => { require(['@/views/page/page.vue'], resolve); } }
+            { path: 'index', title: '看板', name: 'dashboard_index', component: resolve => { require(['@/views/page/page.vue'], resolve); } }
         ]
-    }
+    },
+    {
+        path: '/job-manage',
+        icon: 'ios-folder',
+        name: 'group',
+        title: '任务管理',
+        component: Main,
+        children: [
+            {
+                path: 'job-history',
+                icon: 'ios-paper-outline',
+                name: 'job-history',
+                title: '任务历史',
+                component: resolve => { require(['@/views/job-manage/job-history/job-history.vue'], resolve); }
+            },
+            {
+                path: 'create-new-job',
+                icon: 'ios-list-outline',
+                name: 'create-new-job',
+                title: '创建新任务',
+                component: resolve => { require(['@/views/job-manage/create-new-job/create-new-job.vue'], resolve); }
+            }
+        ]
+    } 
+   
 ];
 
 // 所有上面定义的路由都要写在下面的routers里

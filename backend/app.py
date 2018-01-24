@@ -12,6 +12,8 @@ from core import BaseHandler
 path_join = partial(os.path.join, os.path.dirname(__file__))
 
 
+
+
 class IndexHandler(BaseHandler):
     def get(self):
         self.render('index.html')

@@ -16,9 +16,9 @@ module.exports = merge(webpackBaseConfig, {
     devtool: '#source-map',
     devServer:{
         port:8082,
-        proxyTable:{
+        proxy:{
             '/api':{
-                target:"http://localhost:80801",
+                target:"http://localhost:8081",
                 changeOrigin:true
             }
         }

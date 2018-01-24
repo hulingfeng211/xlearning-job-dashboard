@@ -17,6 +17,13 @@ class IndexHandler(BaseHandler):
         self.render('index.html')
 
 
+class HelloHandler(BaseHandler):
+    def get(self):
+        self.write("hello,iView")
+
+
+
+
 def make_app():
     parse_command_line()
     setting = {
@@ -26,7 +33,8 @@ def make_app():
     }
     handlers = [
         url(r'/', IndexHandler),
-        url(r'/dist/(.*)',StaticFileHandler,{"path":path_join('dist')})
+        url(r'/api/hello',HelloHandler),
+        #url(r'/dist/(.*)',StaticFileHandler,{"path":path_join('dist')}) 
     ]
     app = Application(handlers=handlers, **setting)
     app.listen(8081)

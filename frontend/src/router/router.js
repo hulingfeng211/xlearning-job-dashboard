@@ -41,6 +41,7 @@ export const page500 = {
 export const otherRouter = {
     path: '/',
     name: 'otherRouter',
+    title:'XLearning Job Dashboard',
     component: Main,
     children: [
         { path: 'home', title: {i18n: 'home'}, name: 'home_index', component: resolve => { require(['@/views/home/home.vue'], resolve); } }

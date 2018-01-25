@@ -43,13 +43,13 @@
                     </FormItem>
                     </Col>
                     <Col span="12">
-                    <Upload multiple type="drag" action="/api/upload/model">
+                    <Upload multiple accept=".py" type="drag" :on-error="handle_upload_error" :action="model_upload_url">
                         <div style="padding: 20px 0">
                             <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                             <p>上传模型文件</p>
                         </div>
                     </Upload>
-                    <Upload type="drag" action="//jsonplaceholder.typicode.com/posts/">
+                    <Upload type="drag" :action="data_upload_url">
                         <div style="padding: 20px 0">
                             <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                             <p>上传数据文件</p>
@@ -156,6 +156,8 @@ export default {
                 am_cores:2,
                 am_num:1
             },
+            model_file_type:'.py',
+            uuid:"",
             rules: {
                 name: [{
                     required: true,
@@ -165,7 +167,25 @@ export default {
             }
         };
     },
-    mounted: function() {},
-    methods: {}
+    mounted: function() {
+        this.uuid=this.util.guid()
+    },
+    methods: {
+        handle_upload_error:function(error, file, fileList){
+            console.log(error)
+            this.$Notice.warning({
+                        title: '上传文件错误.'
+                    });
+        }
+    },
+    computed:{
+        model_upload_url:function(){
+           return  '/api/upload/model?type=model&uuid='+this.uuid
+        },
+        data_upload_url:function(){
+           return  '/api/upload/model?type=data&uuid='+this.uuid
+        },
+         
+    }
 };
 </script>

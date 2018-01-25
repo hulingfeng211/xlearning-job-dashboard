@@ -3,10 +3,12 @@ import iView from 'iview';
 import {router} from './router/index';
 import store from './store';
 import App from './app.vue';
-import axios from './http'
+import axios from './http';
+import util from './libs/util';
 import 'iview/dist/styles/iview.css';
 
 Vue.prototype.axios=axios
+Vue.prototype.util=util
 
 Vue.use(iView);
 

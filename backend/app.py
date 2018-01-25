@@ -2,8 +2,9 @@
 
 import os
 from functools import partial
+import shutil
 
-from tornado.web import Application, url, StaticFileHandler
+from tornado.web import Application, url, StaticFileHandler,HTTPError
 from tornado.gen import IOLoop, coroutine
 from tornado.options import parse_command_line
 from tornado.log import gen_log
@@ -34,12 +35,34 @@ class ModelFileUploadHandler(BaseHandler):
     @coroutine
     def post(self):
         #{'file': [{'filename': 'C:\\Users\\15921\\Desktop\\a.txt', 'body': b'a', 'content_type': 'text/plain'}]}
+        uuid=self.get_argument('uuid')
+        upload_type=self.get_argument('type')
+
+        gen_log.info(UPLOAD_DIR)
+        job_file_dir=os.path.join(UPLOAD_DIR,uuid)
+        job_file_dir=os.path.join(job_file_dir,upload_type)
+        
+        if not os.path.exists(job_file_dir):
+            os.makedirs(job_file_dir,exist_ok=False)
+            #os.mkdirs()
+
+        gen_log.info(uuid)
         for upload_file in self.request.files.get('file',[]):
             # C:\\Users\\15921\\Desktop\\a.txt
-            file_name=upload_file.get('filename')
+            remote_file_name=upload_file.get('filename')
+            file_name=os.path.basename(remote_file_name)
+            local_file_path=os.path.join(job_file_dir,file_name)
             
-            body=upload_file.get('body')
-            gen_log.info(file_name)
+            if not os.path.exists(local_file_path) :
+                # todo save file to dir 
+                with open(local_file_path,'wb') as f:
+                    f.write(upload_file.get('body'))
+                
+            else:
+                # todo err file is exists
+                raise HTTPError(status_code=500,log_message='文件已经存在')  
+               
+            
 
 
 def make_app():

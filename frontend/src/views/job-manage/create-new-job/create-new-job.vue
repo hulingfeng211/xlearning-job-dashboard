@@ -126,7 +126,7 @@
                 </FormItem>
             </div>
             <div>
-                <Button type="primary" icon="checkmark-round">提交</Button>
+                <Button @click="handle_form_submit" type="primary" icon="checkmark-round">提交</Button>
             </div>
         </Card>
 
@@ -142,22 +142,23 @@ export default {
             form: {
                 name: "tensorflow_demo  ",
                 type: "tensorflow",
-                input:"/tmp/data/tensorflow#data",
-                output:"/tmp/tensorflow_model#model",
-                files:"demo.py,dataDeal.py",
-                command:"python3 demo.py --data_path=./data --save_path=./model  --log_dir=./eventLog --training_epochs=10",
-                worker_memory:"2G",
-                worker_cores:2,
-                worker_num:1,
-                ps_memory:"2G",
-                ps_cores:2,
-                ps_num:1,
-                am_memory:"2G",
-                am_cores:2,
-                am_num:1
+                input: "/tmp/data/tensorflow#data",
+                output: "/tmp/tensorflow_model#model",
+                files: "demo.py,dataDeal.py",
+                command: "python3 demo.py --data_path=./data --save_path=./model  --log_dir=./eventLog --training_epochs=10",
+                worker_memory: "2G",
+                worker_cores: 2,
+                worker_num: 1,
+                ps_memory: "2G",
+                ps_cores: 2,
+                ps_num: 1,
+                am_memory: "2G",
+                am_cores: 2,
+                am_num: 1,
+                uuid: ''
             },
-            model_file_type:'.py',
-            uuid:"",
+            model_file_type: '.py',
+
             rules: {
                 name: [{
                     required: true,
@@ -168,24 +169,41 @@ export default {
         };
     },
     mounted: function() {
-        this.uuid=this.util.guid()
+        this.form.uuid = this.util.guid()
     },
     methods: {
-        handle_upload_error:function(error, file, fileList){
+        handle_upload_error: function(error, file, fileList) {
             console.log(error)
             this.$Notice.warning({
-                        title: '上传文件错误.'
-                    });
+                title: '上传文件错误.'
+            });
+        },
+        handle_form_submit: function() {
+            let self=this
+            this.$refs.jobForm.validate(valid => {
+                if (valid) {
+
+                    self.axios.post('/api/job/create',self.form).then(function(res){
+                        console.log(res)
+                    }).catch(function(err){
+                        console.log(err)
+                    })
+                    //todo 
+                    this.$router.push({
+                        name: "job-history"
+                    })
+                }
+            });
         }
     },
-    computed:{
-        model_upload_url:function(){
-           return  '/api/upload/model?type=model&uuid='+this.uuid
+    computed: {
+        model_upload_url: function() {
+            return '/api/upload/model?type=model&uuid=' + this.form.uuid
         },
-        data_upload_url:function(){
-           return  '/api/upload/model?type=data&uuid='+this.uuid
+        data_upload_url: function() {
+            return '/api/upload/model?type=data&uuid=' + this.form.uuid
         },
-         
+
     }
 };
 </script>

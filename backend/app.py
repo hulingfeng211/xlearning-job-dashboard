@@ -8,9 +8,11 @@ from tornado.web import Application, url, StaticFileHandler,HTTPError
 from tornado.gen import IOLoop, coroutine
 from tornado.options import parse_command_line
 from tornado.log import gen_log
+from motor import motor_tornado 
 
 from core import BaseHandler
 
+db=motor_tornado.MotorClient('localhost', 27017).xlearning_job
 
 path_join = partial(os.path.join, os.path.dirname(__file__))
 
@@ -29,8 +31,24 @@ class HelloHandler(BaseHandler):
     def get(self):
         self.write("hello,iView")
 
+class JobSubmitHandler(BaseHandler):
+    
+    @coroutine
+    def post(self):
+        gen_log.info(self.request.headers)
+        gen_log.info(self.request.body)
+        data=self.get_all_request_arguments()
+        yield self.db.jobs.insert(data)
+        self.write_json('success')
 
-class ModelFileUploadHandler(BaseHandler):
+class JobHandler(BaseHandler):
+    
+    @coroutine 
+    def get(self):
+       data=yield self.db.jobs.find({}).to_list(length=None)
+       self.write_json(data)         
+
+class FileUploadHandler(BaseHandler):
     
     @coroutine
     def post(self):
@@ -62,7 +80,6 @@ class ModelFileUploadHandler(BaseHandler):
                 # todo err file is exists
                 raise HTTPError(status_code=500,log_message='文件已经存在')  
                
-            
 
 
 def make_app():
@@ -76,9 +93,12 @@ def make_app():
         url(r'/', IndexHandler),
         url(r'/api/hello', HelloHandler),
         url(r'/dist/(.*)', StaticFileHandler, {"path": path_join('dist')}),
-        url(r'/api/upload/model', ModelFileUploadHandler)
+        url(r'/api/upload/model', FileUploadHandler),
+        url(r'/api/job/create',JobSubmitHandler),
+        url(r'/api/jobs',JobHandler),
     ]
     app = Application(handlers=handlers, **setting)
+    app.db=db
     app.listen(8081)
     IOLoop.current().start()
 

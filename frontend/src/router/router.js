@@ -54,7 +54,7 @@ export const appRouter = [
         path: '/dashboard',
         icon: 'ios-paper',
         title: 'Dashboard',
-        name: 'page',
+        name: 'dashboard',
         component: Main,
         children: [
             { path: 'index', title: '看板', name: 'dashboard_index', component: resolve => { require(['@/views/page/page.vue'], resolve); } }
@@ -63,7 +63,7 @@ export const appRouter = [
     {
         path: '/job-manage',
         icon: 'ios-folder',
-        name: 'group',
+        name: 'job-manage',
         title: '任务管理',
         component: Main,
         children: [
@@ -71,7 +71,7 @@ export const appRouter = [
                 path: 'job-history',
                 icon: 'ios-paper-outline',
                 name: 'job-history',
-                title: '任务历史',
+                title: '任务列表',
                 component: resolve => { require(['@/views/job-manage/job-history/job-history.vue'], resolve); }
             },
             {

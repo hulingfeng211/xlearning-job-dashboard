@@ -1,6 +1,6 @@
 /frontend/node_modules/
 /backend/dist/
 /backend/__pycache__/
-/upload/
+/backend/upload/
 *.pyc
 frontend/npm-debug.log

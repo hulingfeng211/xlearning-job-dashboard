@@ -4,15 +4,15 @@ import os
 from functools import partial
 import shutil
 
-from tornado.web import Application, url, StaticFileHandler,HTTPError
+from tornado.web import Application, url, StaticFileHandler, HTTPError
 from tornado.gen import IOLoop, coroutine
 from tornado.options import parse_command_line
 from tornado.log import gen_log
-from motor import motor_tornado 
+from motor import motor_tornado
 
 from core import BaseHandler
 
-db=motor_tornado.MotorClient('localhost', 27017).xlearning_job
+db = motor_tornado.MotorClient('localhost', 27017).xlearning_job
 
 path_join = partial(os.path.join, os.path.dirname(__file__))
 
@@ -31,22 +31,30 @@ class HelloHandler(BaseHandler):
     def get(self):
         self.write("hello,iView")
 
+
 class JobSubmitHandler(BaseHandler):
-    
+
     @coroutine
     def post(self):
         gen_log.info(self.request.headers)
         gen_log.info(self.request.body)
-        data=self.get_all_request_arguments()
+        data = self.get_all_request_arguments()
         yield self.db.jobs.insert(data)
         self.write_json('success')
 
+
 class JobHandler(BaseHandler):
-    
-    @coroutine 
+
+    @coroutine
     def get(self):
-       data=yield self.db.jobs.find({}).to_list(length=None)
-       self.write_json(data)         
+        page_index = int(self.get_argument("page_index", 1))
+        page_size = 10
+        total = yield self.db.jobs.count({})
+        data = yield self.db.jobs.find({}).skip((page_index - 1) * page_size).limit(page_size).to_list(length=None)
+        self.write_json({
+           "total":total,
+           "data":data
+        })         
 
 class FileUploadHandler(BaseHandler):
     
@@ -62,7 +70,7 @@ class FileUploadHandler(BaseHandler):
         
         if not os.path.exists(job_file_dir):
             os.makedirs(job_file_dir,exist_ok=False)
-            #os.mkdirs()
+            # os.mkdirs()
 
         gen_log.info(uuid)
         for upload_file in self.request.files.get('file',[]):

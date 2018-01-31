@@ -1,8 +1,8 @@
 <template>
 <Card>
-    <p slot="title">
+    <p slot="title" @click.prevent="show=!show">
         <Icon type="navicon-round"></Icon>
-        {{item['name']}}
+        {{item.name}}
     </p>
     <a v-show="show" href="#" slot="extra"  @click.prevent="show=false">
         <Icon type="ios-arrow-down"></Icon>

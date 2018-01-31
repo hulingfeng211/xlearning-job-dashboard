@@ -2,5 +2,10 @@
 /backend/dist/
 /backend/__pycache__/
 /backend/upload/
+.vscode/
+.project
+.pydevproject
+.package-lock.json
+.settings/
 *.pyc
 frontend/npm-debug.log

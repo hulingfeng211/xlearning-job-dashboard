@@ -6,7 +6,8 @@ const app = {
         routers: [
             otherRouter,
             ...appRouter
-        ]
+        ],
+        page_size:10
     },
     mutations: {
         updateMenulist (state) {

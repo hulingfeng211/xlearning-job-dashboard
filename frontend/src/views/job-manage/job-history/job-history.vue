@@ -6,7 +6,7 @@
         <job-item v-bind:item="item"></job-item>
         </Col>
     </Row>
-    <Row>
+    <Row v-if="show_pagination">
         <Col>
         <Page @on-change="handle_on_page_change" :total="history_data.total"></Page>
         </Col>
@@ -22,7 +22,7 @@ export default {
     name: "page1",
     data() {
         return {
-            history_data: {}
+            history_data: {total:0}
         };
     },
     components: {
@@ -57,6 +57,13 @@ export default {
     },
     mounted: function() {
         this.load_job_list(1)
+    },
+    computed:{
+        show_pagination:function(){
+            
+            return this.history_data.total>this.$store.state.app.page_size;
+            
+        }
     }
 };
 </script>

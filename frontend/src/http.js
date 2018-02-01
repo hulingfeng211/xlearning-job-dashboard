@@ -3,7 +3,7 @@ import store from './store/index'
 import * as types from './store/types'
 import {router} from './router/index'
 
-// axios 配置
+// axios 配置请求操时设置
 axios.defaults.timeout = 5000;
 //axios.defaults.baseURL = 'https://api.github.com';
 

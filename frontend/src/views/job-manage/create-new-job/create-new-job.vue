@@ -37,9 +37,11 @@
                         </Input>
                     </FormItem>
                     <FormItem prop="command" label="命令:">
-                        <Input v-model="form.command" placeholder="作业执行命令 eg:python demo.py --data_path=./data --save_path=./model --log_dir=./eventLog --training_epochs=10">
-
+                       　
+                        <Input v-model="form.command" icon="ios-information" @on-click="show_command_help=!show_command_help" placeholder="作业执行命令 eg:python demo.py --data_path=./data --save_path=./model --log_dir=./eventLog --training_epochs=10">
+                        
                         </Input>
+                        
                     </FormItem>
                     </Col>
                     <Col span="12">
@@ -49,7 +51,7 @@
                             <p>上传模型文件</p>
                         </div>
                     </Upload>
-                    <Upload type="drag" :action="data_upload_url">
+                    <Upload type="drag" :on-error="handle_upload_error" :action="data_upload_url">
                         <div style="padding: 20px 0">
                             <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                             <p>上传数据文件</p>
@@ -131,79 +133,91 @@
         </Card>
 
     </Form>
+    <Modal
+    v-model="show_command_help"
+    title="Help"
+    >
+    <p>Help</p>
+    </Modal>
 </div>
 </template>
 
 <script>
 export default {
-    name: "page2",
-    data() {
-        return {
-            form: {
-                name: "tensorflow_demo  ",
-                type: "tensorflow",
-                input: "/tmp/data/tensorflow#data",
-                output: "/tmp/tensorflow_model#model",
-                files: "demo.py,dataDeal.py",
-                command: "python3 demo.py --data_path=./data --save_path=./model  --log_dir=./eventLog --training_epochs=10",
-                worker_memory: "2G",
-                worker_cores: 2,
-                worker_num: 1,
-                ps_memory: "2G",
-                ps_cores: 2,
-                ps_num: 1,
-                am_memory: "2G",
-                am_cores: 2,
-                am_num: 1,
-                uuid: ''
-            },
-            model_file_type: '.py',
+  name: "page2",
+  data() {
+    return {
+      form: {
+        name: "tensorflow_demo  ",
+        type: "tensorflow",
+        input: "/tmp/data/tensorflow#data",
+        output: "/tmp/tensorflow_model#model",
+        files: "demo.py,dataDeal.py",
+        command:
+          "python3 demo.py --data_path=./data --save_path=./model  --log_dir=./eventLog --training_epochs=10",
+        worker_memory: "2G",
+        worker_cores: 2,
+        worker_num: 1,
+        ps_memory: "2G",
+        ps_cores: 2,
+        ps_num: 1,
+        am_memory: "2G",
+        am_cores: 2,
+        am_num: 1,
+        uuid: ""
+      },
+      model_file_type: ".py",
 
-            rules: {
-                name: [{
-                    required: true,
-                    message: "任务名不能为空！",
-                    trigger: "blur"
-                }]
-            }
-        };
+      rules: {
+        name: [
+          {
+            required: true,
+            message: "任务名不能为空！",
+            trigger: "blur"
+          }
+        ]
+      },
+      show_command_help: false
+    };
+  },
+  mounted: function() {
+    this.form.uuid = this.util.guid();
+  },
+  methods: {
+    handle_upload_error: function(error, file, fileList) {
+      console.log(error);
+      this.$Notice.warning({
+        title: "上传文件错误."
+      });
     },
-    mounted: function() {
-        this.form.uuid = this.util.guid()
-    },
-    methods: {
-        handle_upload_error: function(error, file, fileList) {
-            console.log(error)
-            this.$Notice.warning({
-                title: '上传文件错误.'
-            });
-        },
-        handle_form_submit: function() {
-            let self=this
-            this.$refs.jobForm.validate(valid => {
-                if (valid) {
 
-                    self.axios.post('/api/job/create',self.form).then(function(res){
-                        console.log(res)
-                    }).catch(function(err){
-                        console.log(err)
-                    })
-                    //todo 
-                    this.$router.push({
-                        name: "job-history"
-                    })
-                }
+    handle_form_submit: function() {
+      let self = this;
+      this.$refs.jobForm.validate(valid => {
+        if (valid) {
+          self.axios
+            .post("/api/jobs", self.form)
+            .then(function(res) {
+              console.log(res);
+            })
+            .catch(function(err) {
+              console.log(err);
             });
+          //todo
+          this.$router.push({
+            name: "job-history"
+          });
         }
-    },
-    computed: {
-        model_upload_url: function() {
-            return '/api/upload/model?type=model&uuid=' + this.form.uuid
-        },
-        data_upload_url: function() {
-            return '/api/upload/model?type=data&uuid=' + this.form.uuid
-        },
-
+      });
     }
+  },
+  computed: {
+    model_upload_url: function() {
+      return "/api/upload/model?type=model&uuid=" + this.form.uuid;
+    },
+    data_upload_url: function() {
+      return "/api/upload/model?type=data&uuid=" + this.form.uuid;
+    }
+  }
 };
 </script>

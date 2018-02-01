@@ -28,11 +28,11 @@ class BaseHandler(RequestHandler):
 
     def get_request_argument(self, name, default_value=None):
         """
-        根据给定的参数名获取参数值,特别处理了json的请求
+        根据给定的参数名获取参数值,优先处理了json的请求
         """
         if self.is_json_request():
             body = json.loads(self.request.body)
-        if not body:
+        if body:
             return body.get(name, default_value)
         else:
             return self.get_argument(name,default_value)

@@ -1,4 +1,5 @@
 <template>
+<div>
 <Card>
     <p slot="title" @click.prevent="show=!show">
         <Icon type="navicon-round"></Icon>
@@ -12,7 +13,7 @@
         <Icon type="ios-arrow-right"></Icon>
         展开
     </a>
-    <a href="#" slot="extra" style="color:#f90" @click.prevent="changeLimit">
+    <a href="#" slot="extra" style="color:#f90" @click.prevent="handle_start_job">
         <Icon type="play"></Icon>
         开始运行
     </a>
@@ -24,7 +25,7 @@
         <Icon type="ios-loop-strong"></Icon>
         查看运行
     </a>
-    <a href="#" slot="extra" style="color:red;" @click.prevent="changeLimit">
+    <a href="#" slot="extra" style="color:red;" @click.prevent="handle_delete_confirm">
         <Icon type="trash-a"></Icon>
         删除
     </a>
@@ -136,7 +137,7 @@
                     <p>上传模型文件</p>
                 </div>
             </Upload>
-            <Upload type="drag" :action="data_upload_url">
+            <Upload type="drag" :action="data_upload_url" :on-error="handle_upload_error">
                 <div style="padding: 20px 0">
                     <Icon type="ios-cloud-upload" size="30" style="color: #3399ff"></Icon>
                     <p>上传数据文件</p>
@@ -147,6 +148,15 @@
     </div>
 
 </Card>
+<Modal
+ v-model="delete_modal_show"
+ title="删除提醒"
+ @on-ok="handle_delete_confirm_ok(item)"
+ :loading="delete_modal_loading"
+>
+    <p>是否确认删除?</p>
+</Modal>
+</div>
 </template>
 
 <style scoped>
@@ -164,9 +174,45 @@ export default {
     name: "job-item",
     data() {
         return {
-            show: false
-
+            show: false,
+            delete_modal_show:false,
+            delete_modal_loading:true
         }
+    },
+    methods:{
+        handle_delete_confirm:function(){
+            this.delete_modal_show=true;
+        },
+
+        handle_start_job:function(){
+            this.$emit('on-start-job',this.item._id)
+        },
+
+        handle_delete_confirm_ok:function(job){
+            let self=this
+            //触发控件上绑定的on-delete-job事件，可以参看job-history.vue中关于<job-item @on-delete-job的用法
+            this.$emit('on-delete-job',this.item,()=>{
+                self.delete_modal_show=false
+            })
+            
+            //setTimeout(()=>{
+            //    self.delete_modal_show=false
+            //},2000)
+        },
+        handle_upload_error:function(){
+            this.$Notice.open({
+                title:"上传文件失败!"
+            })
+        }
+    },
+    computed: {
+        model_upload_url: function() {
+            return '/api/upload/model?type=model&uuid=' + this.item.uuid
+        },
+        data_upload_url: function() {
+            return '/api/upload/model?type=data&uuid=' + this.item.uuid
+        },
+
     }
 }
 </script>
